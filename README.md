@@ -1,154 +1,154 @@
 # Football Board
 
-Praktikum SS 2026, TUM (Betreuer: J. Mangler).
+Practical course SS 2026, TUM (supervisor: J. Mangler).
 
-Ein berührungsloser Fußball-Kiosk: links wählt man per QR-Code eine von
-vier Ligen, rechts stehen die Navigations-QRs. Zur gewählten Liga zeigt
-der Kiosk die Tabelle, den aktuellen Spieltag mit Ergebnissen und
-Anstoßzeiten und zu jedem Spiel die Form der beiden Teams aus den
-letzten fünf Partien.
+A touch-free football kiosk. On the left, the visitor picks one of four
+leagues by scanning a QR code; on the right sit the navigation QR codes.
+For the chosen league the board shows the standings, the current
+matchday with results and kickoff times, and for every match the recent
+form of both teams.
 
-## Funktionen
+## Features
 
-- 4 Ligen (Premier League, La Liga, Bundesliga, Serie A), Auswahl per
-  QR-Scan mit dem Handy
-- Tabelle: Platz, Spiele, S/U/N, Tore, Differenz, Punkte
-- Spieltag: der komplette aktuelle Spieltag, beendete Spiele mit
-  Ergebnis, offene mit Anstoßzeit
-- Spieldetail: Formkurve beider Teams (W/D/L, Gegner, Ergebnis)
-- Navigation nur per QR: Spieltag, Tabelle, Liga wechseln, Zurück, Exit
-- Wächter: nach 180 s ohne Scan springt der Kiosk von selbst zur
-  Ligawahl zurück und läuft endlos weiter
+- 4 leagues (Premier League, La Liga, Bundesliga, Serie A), selected by
+  scanning a QR code with a phone
+- Standings: position, played, W/D/L, goals, difference, points
+- Matchday: the complete current matchday, finished games with the
+  score, remaining games with kickoff time
+- Match detail: form of both teams (W/D/L chips, opponent, result)
+- Navigation only via QR: Matchday, Table, Change league, Back, Exit
+- Watchdog: after 180 s without a scan the kiosk returns to the league
+  menu by itself and keeps running
 
 ## Screenshots
 
-| Ligawahl | Tabelle | Spieltag |
+| League menu | Standings | Matchday |
 |---|---|---|
-| ![Menu](league_menu.png) | ![Tabelle](league_table.png) | ![Spieltag](matchday.png) |
+| ![Menu](img/league_menu.png) | ![Table](img/league_table.png) | ![Matchday](img/matchday.png) |
 
-| Spieldetail | Handy |
+| Match detail | Phone |
 |---|---|
-| ![Detail](match_detail.png) | ![Handy](phone_scan.png) |
+| ![Detail](img/match_detail.png) | ![Phone](img/phone_scan.png) |
 
-## Architektur
+## Architecture
 
-Kernregel: der CPEE-Prozess ruft nie eine externe API auf. Alles Externe
-macht der eigene Server; der Prozess sagt ihm nur "hol Liga X" und
-bekommt die aufbereiteten Daten zurück.
+Core rule: the CPEE process never calls an external API. Everything
+external is done by the own server; the process only tells it "get
+league X" and receives the prepared data back.
 
 ```
                  +-----------------------+
 football-data.org|  football_backend.js  |
-   <------------ |  (Node, Port 12783)   |
+   <------------ |  (Node, port 12783)   |
                  +-----------+-----------+
-                             | antwortet mit JSON,
-                             | schreibt zusätzlich
+                             | answers with JSON,
+                             | also writes files
                              v
         football.json   match.json   table.json     (public_html)
                              |
-                     CPEE-Prozess
-                   (Base64 in Seiten-URL)
+                     CPEE process
+                  (Base64 in the page URL)
                              |
                              v
          https://cpee.org/out/frames/AfandiyevRustam
                              ^
-                             | Scan -> fb_send.html -> cpee_callback
-                          Handy
+                             | scan -> fb_send.html -> cpee_callback
+                          phone
 ```
 
-- Der Server antwortet dem Prozess direkt mit dem Ergebnis. Die
-  JSON-Dateien schreibt er zusätzlich - zum Nachschauen beim Debuggen
-  und weil `/fb_match` den gewählten Spieltag aus `football.json` liest.
-- Pro Liga wird höchstens alle 5 Minuten neu bei football-data.org
-  angefragt (Free Tier: 10 Requests/Minute).
-- Daten laufen als Base64 in der Seiten-URL zum Frame. Zurück zum
-  Prozess laufen nur Codes und Indizes (`BL1`, `m3`, `table`), nie
-  Namen - Umlaute überleben den Callback-Weg nicht.
+- The server answers the process directly with the result. The JSON
+  files are written in addition: for inspection while debugging, and
+  because `/fb_match` looks up the selected match in `football.json`.
+- Per league, football-data.org is queried at most every 5 minutes
+  (free tier: 10 requests per minute).
+- Data travels to the frame as Base64 in the page URL. Back to the
+  process travel only codes and indexes (`BL1`, `m3`, `table`), never
+  names: non-ASCII characters do not survive the callback path.
 
-## Der CPEE-Prozess
+## The CPEE process
 
-![Prozess Teil 1](process_1_league.png) ![Prozess Teil 2](process_2_matchday.png) ![Prozess Teil 3](process_3_detail_watchdog.png)
+![Process part 1](img/process_1_league.png) ![Process part 2](img/process_2_matchday.png) ![Process part 3](img/process_3_detail_watchdog.png)
 
-Datenelemente und Endpunkte des Modells:
+Data elements and endpoints of the model:
 
-| Datenelemente | Endpunkte |
+| Data elements | Endpoints |
 |---|---|
-| ![Daten](data_elements.png) | ![Endpoints](endpoints.png) |
+| ![Data](img/data_elements.png) | ![Endpoints](img/endpoints.png) |
 
-Ablauf einer Runde:
+One round:
 
-1. Init Frame baut das 10x8-Raster auf (einmalig)
-2. Reset Round setzt `finished`, `choice` und `league` zurück
-3. Show League Menu zeigt die Ligawahl; vier QR-Frames laufen als
-   `parallel wait="1" cancel="last"` gegeneinander - der erste Scan
-   gewinnt, die anderen drei werden abgebrochen
-4. Fetch League Table lässt den Server die Tabelle holen und übernimmt
-   die Antwort direkt in `data.tbl`; Show League Table zeigt sie
-5. Scan "Spieltag": Fetch League Matches, Matchday Board zeigt den
-   Spieltag; das Board selbst ist ein wartender Frame und läuft
-   parallel zu den drei Navigations-QRs
-6. Scan eines Spiels (`m3`): Select Match, Fetch Match Detail, Show
-   Match Detail, QR Back
-7. Scan "Tabelle" führt zur Tabelle zurück, "Liga wechseln" zur
-   Ligawahl, "Exit" leert den Schirm - danach beginnt in allen Fällen
-   die nächste Runde
+1. Init Frame creates the 10x8 grid (once)
+2. Reset Round clears `finished`, `choice` and `league`
+3. Show League Menu displays the menu; four QR frames race each other
+   as `parallel wait="1" cancel="last"` - the first scan wins, the
+   other three are cancelled
+4. Fetch League Table has the server fetch the standings and stores
+   the answer directly in `data.tbl`; Show League Table displays it
+5. Scan "Matchday": Fetch League Matches, then the Matchday Board
+   shows the matchday; the board itself is a waiting frame and races
+   the three navigation QR codes
+6. Scan a match (`m3`): Select Match, Fetch Match Detail, Show Match
+   Detail, QR Back
+7. Scan "Table" returns to the standings, "Change league" to the
+   league menu, "Exit" clears the screen - in every case the next
+   round starts
 
-Vier ineinander liegende Schleifen tragen den Ablauf: Kiosk (endlos),
-Liga (bis Liga wechseln oder Exit), Tabellenseite und Spieltag. Jede
-Schleifenbedingung nennt genau die Wörter, die sie verlassen.
+Four nested loops carry the flow: kiosk (endless), league (until
+Change league or Exit), standings screen, and matchday. Each loop
+condition names exactly the words that leave it.
 
-Wächter: `finished` wird beim Rundenstart und nach jeder Interaktion
-auf 0 gesetzt; ein paralleler Zweig zählt in 3-Sekunden-Schritten
-hoch. Erreicht er 180, wird der wartende Frame abgebrochen und die
-Runde beginnt neu. Der Prozess läuft dabei endlos, `<stop>` gibt es
-nicht.
+Watchdog: `finished` is set to 0 at the start of a round and after
+every interaction; a parallel branch counts up in 3-second steps.
+When it reaches 180, the waiting frame is cancelled and the round
+starts over. The process runs forever; there is no `<stop>`.
 
-Board: der Prozess ist als Subprozess aufrufbar - liegt im Hub,
-braucht keinen Input, spricht die Anzeige nur über die Endpunkte
-`frames_init` und `frames_display` an. URL:
+Board: the process can be started as a subprocess - it lives in the
+hub, needs no input, and addresses the display only through the
+endpoints `frames_init` and `frames_display`. URL:
 <https://cpee.org/hub/server/Teaching.dir/Prak.dir/TUM-Prak-26-SS.dir/AfandiyevRustam.dir/football.xml/>
 
-## Dateien und Datenfluss
+## Files and data flow
 
-| Datei | schreibt | liest | Takt |
+| File | written by | read by | cadence |
 |---|---|---|---|
-| table.json | Server (`/fb_table`) | - (Prozess bekommt die Antwort direkt) | pro Ligawahl, Cache 5 min |
-| football.json | Server (`/fb_matches`) | Server (`/fb_match` sucht `matches[idx]`) | pro Spieltag-Aufruf, Cache 5 min |
-| match.json | Server (`/fb_match`) | - | pro Spielwahl |
+| table.json | server (`/fb_table`) | - (process receives the answer directly) | per league choice, cache 5 min |
+| football.json | server (`/fb_matches`) | server (`/fb_match` looks up `matches[idx]`) | per matchday request, cache 5 min |
+| match.json | server (`/fb_match`) | - | per match choice |
 
 ## Backend (football_backend.js)
 
-| Tür | Aufgabe |
+| Route | Task |
 |---|---|
-| /fb_table?league=BL1 | Tabelle holen, `table.json` schreiben, Tabelle zurückgeben |
-| /fb_matches?league=BL1 | aktuellen Spieltag holen, `football.json` schreiben, zurückgeben |
-| /fb_match?league=BL1&idx=3 | Spiel `idx` aus `football.json`, Form beider Teams (letzte 5), `match.json` schreiben, zurückgeben |
-| / | Lebenszeichen, Liste der Ligen |
+| /fb_table?league=BL1 | fetch standings, write `table.json`, return standings |
+| /fb_matches?league=BL1 | fetch current matchday, write `football.json`, return it |
+| /fb_match?league=BL1&idx=3 | match `idx` from `football.json`, form of both teams (last 5), write `match.json`, return it |
+| / | health check, list of leagues |
 
-Liga-Codes: `PL`, `PD`, `BL1`, `SA`. Der API-Schlüssel für
-football-data.org kommt aus der Umgebungsvariable `FB_KEY` und steht
-nicht im Code. Nicht-ASCII-Zeichen werden als `\uXXXX` geschrieben,
-damit Vereinsnamen auf keinem Weg verstümmelt werden.
+League codes: `PL`, `PD`, `BL1`, `SA`. The football-data.org API key is
+read from the environment variable `FB_KEY` and is not in the code.
+Non-ASCII characters are written as `\uXXXX`, so club names cannot be
+garbled on any path.
 
-## Seiten
+## Pages
 
-- fb_menu.html - Startseite mit Anleitung, linke Spalte; die vier
-  Liga-QRs daneben sind eigene fb_qr-Frames
-- fb_qr.html - generischer QR-Frame: zeigt den Callback der wartenden
-  Aufgabe als QR, Parameter `value` und `labelb`
-- fb_send.html - wird vom Handy geöffnet, sendet `value` per PUT an
-  den Callback
-- fb_table.html - Tabelle
-- fb_matches.html - Spieltag, jedes Spiel mit eigenem QR (`m0`, `m1`, ...)
-- fb_match.html - Spieldetail mit Formkurven
+- fb_menu.html - start page with instructions, left column; the four
+  league QR codes next to it are separate fb_qr frames
+- fb_qr.html - generic QR frame: renders the callback of the waiting
+  task as a QR code, parameters `value` and `labelb`
+- fb_send.html - opened on the phone, sends `value` as a PUT to the
+  callback
+- fb_table.html - standings
+- fb_matches.html - matchday, every match with its own QR code (`m0`,
+  `m1`, ...)
+- fb_match.html - match detail with form
 
-Alle Seiten lesen ihre Daten aus dem `data`-Parameter der URL (Base64).
+All pages read their data from the `data` parameter of the URL (Base64).
 
-## Starten
+## Running it
 
-1. Server auf lehre:
-   `export FB_KEY=...` dann
+1. Server on lehre:
+   `export FB_KEY=...` then
    `nohup node football_backend.js > football_backend.log 2>&1 &`
-2. HTML-Seiten nach `~/public_html`
-3. football.xml in CPEE als neue Instanz laden und starten
-4. Anzeige: <https://cpee.org/out/frames/AfandiyevRustam>
+2. HTML pages into `~/public_html`
+3. Load football.xml in CPEE as a new instance and start it
+4. Display: <https://cpee.org/out/frames/AfandiyevRustam>
