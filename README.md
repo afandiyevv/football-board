@@ -24,11 +24,11 @@ letzten fünf Partien.
 
 | Ligawahl | Tabelle | Spieltag |
 |---|---|---|
-| ![Menu](img/league_menu.png) | ![Tabelle](img/league_table.png) | ![Spieltag](img/matchday.png) |
+| ![Menu](league_menu.png) | ![Tabelle](league_table.png) | ![Spieltag](matchday.png) |
 
 | Spieldetail | Handy |
 |---|---|
-| ![Detail](img/match_detail.png) | ![Handy](img/phone_scan.png) |
+| ![Detail](match_detail.png) | ![Handy](phone_scan.png) |
 
 ## Architektur
 
@@ -67,13 +67,13 @@ football-data.org|  football_backend.js  |
 
 ## Der CPEE-Prozess
 
-![Prozess Teil 1](img/process_1_league.png) ![Prozess Teil 2](img/process_2_matchday.png) ![Prozess Teil 3](img/process_3_detail_watchdog.png)
+![Prozess Teil 1](process_1_league.png) ![Prozess Teil 2](process_2_matchday.png) ![Prozess Teil 3](process_3_detail_watchdog.png)
 
 Datenelemente und Endpunkte des Modells:
 
 | Datenelemente | Endpunkte |
 |---|---|
-| ![Daten](img/data_elements.png) | ![Endpoints](img/endpoints.png) |
+| ![Daten](data_elements.png) | ![Endpoints](endpoints.png) |
 
 Ablauf einer Runde:
 
