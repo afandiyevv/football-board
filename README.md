@@ -146,9 +146,7 @@ All pages read their data from the `data` parameter of the URL (Base64).
 
 ## Running it
 
-1. Server on lehre:
-   `export FB_KEY=...` then
-   `nohup node football_backend.js > football_backend.log 2>&1 &`
+1. Server on lehre: `nohup node football_backend.js > football_backend.log 2>&1 &`
 2. HTML pages into `~/public_html`
 3. Load football.xml in CPEE as a new instance and start it
 4. Display: <https://cpee.org/out/frames/AfandiyevRustam>
