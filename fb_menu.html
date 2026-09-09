@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football Board</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(160deg,#0b1a0f 0%,#14301c 100%); color:#eef9f0;
+    min-height:100vh; padding:30px; display:flex; flex-direction:column; justify-content:center; }
+  h1 { font-size:28px; font-weight:800; margin-bottom:10px; }
+  .sub { font-size:15px; color:#8cb89a; margin-bottom:26px; line-height:1.5; }
+  .step { display:flex; gap:12px; align-items:flex-start; margin-bottom:14px; }
+  .num { background:#22c55e; color:#06230f; font-weight:800; border-radius:50%;
+    width:26px; height:26px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .step p { color:#c9e5d2; font-size:14px; line-height:1.45; }
+</style>
+</head>
+<body>
+  <h1>&#9917; Football Match Board</h1>
+  <div class="sub">Tables, matchdays and team form &mdash; controlled entirely from your phone.</div>
+  <div class="step"><div class="num">1</div><p><b>Pick a league</b> &mdash; scan one of the four codes on the right.</p></div>
+  <div class="step"><div class="num">2</div><p><b>See the table</b> of that league, then scan for the current matchday.</p></div>
+  <div class="step"><div class="num">3</div><p><b>Scan a match</b> to see both teams' last results.</p></div>
+</body>
+</html>

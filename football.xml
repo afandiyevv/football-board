@@ -1,0 +1,752 @@
+<testset xmlns="http://cpee.org/ns/properties/2.0">
+  <executionhandler>ruby</executionhandler>
+  <dataelements>
+    <league></league>
+    <choice></choice>
+    <matchidx></matchidx>
+    <tbl>{}</tbl>
+    <fb>{}</fb>
+    <detail>{}</detail>
+    <tbl_b64></tbl_b64>
+    <fb_b64></fb_b64>
+    <detail_b64></detail_b64>
+    <finished>0</finished>
+  </dataelements>
+  <documents/>
+  <endpoints>
+    <user>https-post://cpee.org/services/timeout-user.php</user>
+    <auto>https-post://cpee.org/services/timeout-auto.php</auto>
+    <subprocess>https-post://cpee.org/flow/start/url/</subprocess>
+    <timeout>https-post://cpee.org/services/timeout.php</timeout>
+    <send>https-post://cpee.org/ing/correlators/message/send/</send>
+    <receive>https-get://cpee.org/ing/correlators/message/receive/</receive>
+    <fb_backend>https://lehre.bpm.in.tum.de/ports/12783/fb_matches</fb_backend>
+    <fb_match_backend>https://lehre.bpm.in.tum.de/ports/12783/fb_match</fb_match_backend>
+    <fb_table_backend>https://lehre.bpm.in.tum.de/ports/12783/fb_table</fb_table_backend>
+    <frames_init>https-post://cpee.org/out/frames/{AfandiyevRustam}/</frames_init>
+    <frames_display>https-put://cpee.org/out/frames/{AfandiyevRustam}/</frames_display>
+  </endpoints>
+  <attributes>
+    <info>Football Board</info>
+    <creator>Rustam Afandiyev</creator>
+    <author>Rustam Afandiyev</author>
+    <modeltype>CPEE</modeltype>
+    <guarded>none</guarded>
+    <guarded_id/>
+    <model_uuid>f5482549-e978-4285-9e3f-3fd491d93074</model_uuid>
+    <model_version/>
+    <theme>extended</theme>
+    <design_dir>Teaching.dir/Prak.dir/TUM-Prak-26-SS.dir/AfandiyevRustam.dir</design_dir>
+    <design_stage>development</design_stage>
+  </attributes>
+  <description>
+    <description xmlns="http://cpee.org/ns/description/1.0">
+
+      <manipulate id="a10" label="Init">
+        <code>data.finished = 0</code>
+      </manipulate>
+
+      <call id="a1" endpoint="frames_init">
+        <parameters>
+          <label>Init Frame</label>
+          <arguments>
+            <style_url>https://cpee.org/form/frames.css</style_url>
+            <document_url/>
+            <x_amount>10</x_amount>
+            <y_amount>8</y_amount>
+            <lang>en-us</lang>
+            <document_name>Football Board</document_name>
+          </arguments>
+        </parameters>
+        <code>
+          <finalize output="result"/>
+          <update output="result"/>
+          <rescue output="result"/>
+        </code>
+        <annotations>
+          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+          <_notes><_notes_general/></_notes>
+        </annotations>
+        <documentation><input/></documentation>
+      </call>
+
+      <loop id="e1" mode="pre_test" condition="true">
+
+        <manipulate id="a40" label="Reset Round">
+          <code>data.finished = 0
+data.choice = ""
+data.league = ""</code>
+        </manipulate>
+
+        <parallel id="e10" wait="1" cancel="last">
+
+          <parallel_branch>
+
+            <call id="a2" endpoint="frames_display">
+              <parameters>
+                <label>Show League Menu</label>
+                <arguments>
+                  <type>set</type>
+                  <lx>0</lx>
+                  <ly>0</ly>
+                  <x_amount>4</x_amount>
+                  <y_amount>8</y_amount>
+                  <urls>
+                    <urls_item>
+                      <lang>en-us</lang>
+                      <url>https://lehre.bpm.in.tum.de/~go49leg/fb_menu.html?v=1</url>
+                    </urls_item>
+                  </urls>
+                  <default/>
+                </arguments>
+              </parameters>
+              <code>
+                <finalize output="result"/>
+                <update output="result"/>
+                <rescue output="result"/>
+              </code>
+              <annotations>
+                <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                <_notes><_notes_general/></_notes>
+              </annotations>
+              <documentation><input/></documentation>
+            </call>
+
+            <parallel id="e2" wait="1" cancel="last">
+              <parallel_branch>
+                <call id="a3" endpoint="frames_display">
+                  <parameters>
+                    <label>QR Premier League</label>
+                    <arguments>
+                      <type>wait</type>
+                      <lx>4</lx>
+                      <ly>0</ly>
+                      <x_amount>3</x_amount>
+                      <y_amount>4</y_amount>
+                      <urls>
+                        <urls_item>
+                          <lang>en-us</lang>
+                          <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=PL&amp;labelb=UHJlbWllciBMZWFndWU</url>
+                        </urls_item>
+                      </urls>
+                      <default/>
+                    </arguments>
+                  </parameters>
+                  <code>
+                    <finalize output="result">data.league = "PL"</finalize>
+                    <update output="result"/>
+                    <rescue output="result"/>
+                  </code>
+                  <annotations>
+                    <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                    <_notes><_notes_general/></_notes>
+                  </annotations>
+                  <documentation><input/></documentation>
+                </call>
+              </parallel_branch>
+              <parallel_branch>
+                <call id="a4" endpoint="frames_display">
+                  <parameters>
+                    <label>QR La Liga</label>
+                    <arguments>
+                      <type>wait</type>
+                      <lx>7</lx>
+                      <ly>0</ly>
+                      <x_amount>3</x_amount>
+                      <y_amount>4</y_amount>
+                      <urls>
+                        <urls_item>
+                          <lang>en-us</lang>
+                          <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=PD&amp;labelb=TGEgTGlnYQ</url>
+                        </urls_item>
+                      </urls>
+                      <default/>
+                    </arguments>
+                  </parameters>
+                  <code>
+                    <finalize output="result">data.league = "PD"</finalize>
+                    <update output="result"/>
+                    <rescue output="result"/>
+                  </code>
+                  <annotations>
+                    <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                    <_notes><_notes_general/></_notes>
+                  </annotations>
+                  <documentation><input/></documentation>
+                </call>
+              </parallel_branch>
+              <parallel_branch>
+                <call id="a5" endpoint="frames_display">
+                  <parameters>
+                    <label>QR Bundesliga</label>
+                    <arguments>
+                      <type>wait</type>
+                      <lx>4</lx>
+                      <ly>4</ly>
+                      <x_amount>3</x_amount>
+                      <y_amount>4</y_amount>
+                      <urls>
+                        <urls_item>
+                          <lang>en-us</lang>
+                          <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=BL1&amp;labelb=QnVuZGVzbGlnYQ</url>
+                        </urls_item>
+                      </urls>
+                      <default/>
+                    </arguments>
+                  </parameters>
+                  <code>
+                    <finalize output="result">data.league = "BL1"</finalize>
+                    <update output="result"/>
+                    <rescue output="result"/>
+                  </code>
+                  <annotations>
+                    <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                    <_notes><_notes_general/></_notes>
+                  </annotations>
+                  <documentation><input/></documentation>
+                </call>
+              </parallel_branch>
+              <parallel_branch>
+                <call id="a6" endpoint="frames_display">
+                  <parameters>
+                    <label>QR Serie A</label>
+                    <arguments>
+                      <type>wait</type>
+                      <lx>7</lx>
+                      <ly>4</ly>
+                      <x_amount>3</x_amount>
+                      <y_amount>4</y_amount>
+                      <urls>
+                        <urls_item>
+                          <lang>en-us</lang>
+                          <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=SA&amp;labelb=U2VyaWUgQQ</url>
+                        </urls_item>
+                      </urls>
+                      <default/>
+                    </arguments>
+                  </parameters>
+                  <code>
+                    <finalize output="result">data.league = "SA"</finalize>
+                    <update output="result"/>
+                    <rescue output="result"/>
+                  </code>
+                  <annotations>
+                    <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                    <_notes><_notes_general/></_notes>
+                  </annotations>
+                  <documentation><input/></documentation>
+                </call>
+              </parallel_branch>
+            </parallel>
+
+            <manipulate id="a41" label="Touch">
+              <code>data.finished = 0</code>
+            </manipulate>
+
+            <call id="a28" endpoint="fb_table_backend">
+              <parameters>
+                <label>Fetch League Table</label>
+                <method>:get</method>
+                <arguments>
+                  <league>!data.league</league>
+                </arguments>
+              </parameters>
+              <code>
+                <finalize output="result">data.tbl = result</finalize>
+                <update output="result"/>
+                <rescue output="result"/>
+              </code>
+              <annotations>
+                <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                <_notes><_notes_general/></_notes>
+              </annotations>
+              <documentation><input/></documentation>
+            </call>
+
+            <manipulate id="a30" label="Encode Table">
+              <code>require 'json'
+require 'base64'
+data.tbl_b64 = Base64.urlsafe_encode64(JSON.generate(data.tbl), padding: false)</code>
+            </manipulate>
+
+            <loop id="e12" mode="pre_test" condition="data.choice != 'league' &amp;&amp; data.choice != 'exit'">
+
+            <loop id="e7" mode="pre_test" condition="data.choice != 'matches' &amp;&amp; data.choice != 'league' &amp;&amp; data.choice != 'exit'">
+              <call id="a31" endpoint="frames_display">
+                <parameters>
+                  <label>Show League Table</label>
+                  <arguments>
+                    <type>set</type>
+                    <lx>0</lx>
+                    <ly>0</ly>
+                    <x_amount>8</x_amount>
+                    <y_amount>8</y_amount>
+                    <urls>
+                      <urls_item>
+                        <lang>en-us</lang>
+                        <url>!("https://lehre.bpm.in.tum.de/~go49leg/fb_table.html?v=1&amp;data=" + data.tbl_b64.to_s)</url>
+                      </urls_item>
+                    </urls>
+                    <default/>
+                  </arguments>
+                </parameters>
+                <code>
+                  <finalize output="result"/>
+                  <update output="result"/>
+                  <rescue output="result"/>
+                </code>
+                <annotations>
+                  <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                  <_notes><_notes_general/></_notes>
+                </annotations>
+                <documentation><input/></documentation>
+              </call>
+
+              <parallel id="e8" wait="1" cancel="last">
+                <parallel_branch>
+                  <call id="a32" endpoint="frames_display">
+                    <parameters>
+                      <label>QR Show Matches</label>
+                      <arguments>
+                        <type>wait</type>
+                        <lx>8</lx>
+                        <ly>0</ly>
+                        <x_amount>2</x_amount>
+                        <y_amount>3</y_amount>
+                        <urls>
+                          <urls_item>
+                            <lang>en-us</lang>
+                            <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=matches&amp;labelb=TWF0Y2hkYXk</url>
+                          </urls_item>
+                        </urls>
+                        <default/>
+                      </arguments>
+                    </parameters>
+                    <code>
+                      <finalize output="result">data.choice = "matches"</finalize>
+                      <update output="result"/>
+                      <rescue output="result"/>
+                    </code>
+                    <annotations>
+                      <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                      <_notes><_notes_general/></_notes>
+                    </annotations>
+                    <documentation><input/></documentation>
+                  </call>
+                </parallel_branch>
+                <parallel_branch>
+                  <call id="a33" endpoint="frames_display">
+                    <parameters>
+                      <label>QR Change League</label>
+                      <arguments>
+                        <type>wait</type>
+                        <lx>8</lx>
+                        <ly>3</ly>
+                        <x_amount>2</x_amount>
+                        <y_amount>3</y_amount>
+                        <urls>
+                          <urls_item>
+                            <lang>en-us</lang>
+                            <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=league&amp;labelb=Q2hhbmdlIGxlYWd1ZQ</url>
+                          </urls_item>
+                        </urls>
+                        <default/>
+                      </arguments>
+                    </parameters>
+                    <code>
+                      <finalize output="result">data.choice = "league"</finalize>
+                      <update output="result"/>
+                      <rescue output="result"/>
+                    </code>
+                    <annotations>
+                      <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                      <_notes><_notes_general/></_notes>
+                    </annotations>
+                    <documentation><input/></documentation>
+                  </call>
+                </parallel_branch>
+                <parallel_branch>
+                  <call id="a34" endpoint="frames_display">
+                    <parameters>
+                      <label>QR Exit</label>
+                      <arguments>
+                        <type>wait</type>
+                        <lx>8</lx>
+                        <ly>6</ly>
+                        <x_amount>2</x_amount>
+                        <y_amount>2</y_amount>
+                        <urls>
+                          <urls_item>
+                            <lang>en-us</lang>
+                            <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=exit</url>
+                          </urls_item>
+                        </urls>
+                        <default/>
+                      </arguments>
+                    </parameters>
+                    <code>
+                      <finalize output="result">data.choice = "exit"</finalize>
+                      <update output="result"/>
+                      <rescue output="result"/>
+                    </code>
+                    <annotations>
+                      <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                      <_notes><_notes_general/></_notes>
+                    </annotations>
+                    <documentation><input/></documentation>
+                  </call>
+                </parallel_branch>
+              </parallel>
+
+              <manipulate id="a42" label="Touch">
+                <code>data.finished = 0</code>
+              </manipulate>
+            </loop>
+
+            <choose id="e9" mode="exclusive">
+              <alternative condition="data.choice == 'matches'">
+
+                <call id="a7" endpoint="fb_backend">
+                  <parameters>
+                    <label>Fetch League Matches</label>
+                    <method>:get</method>
+                    <arguments>
+                      <league>!data.league</league>
+                    </arguments>
+                  </parameters>
+                  <code>
+                    <finalize output="result">data.fb = result</finalize>
+                    <update output="result"/>
+                    <rescue output="result"/>
+                  </code>
+                  <annotations>
+                    <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                    <_notes><_notes_general/></_notes>
+                  </annotations>
+                  <documentation><input/></documentation>
+                </call>
+
+                <manipulate id="a9" label="Encode Matchday">
+                  <code>require 'json'
+require 'base64'
+data.fb_b64 = Base64.urlsafe_encode64(JSON.generate(data.fb), padding: false)</code>
+                </manipulate>
+
+                <manipulate id="a35" label="Enter Matches">
+                  <code>data.choice = ""</code>
+                </manipulate>
+
+                <loop id="e3" mode="pre_test" condition="data.choice != 'league' &amp;&amp; data.choice != 'exit' &amp;&amp; data.choice != 'table'">
+
+                  <parallel id="e4" wait="1" cancel="last">
+                    <parallel_branch>
+                      <call id="a11" endpoint="frames_display">
+                        <parameters>
+                          <label>Matchday Board (pick a match)</label>
+                          <arguments>
+                            <type>wait</type>
+                            <lx>0</lx>
+                            <ly>0</ly>
+                            <x_amount>8</x_amount>
+                            <y_amount>8</y_amount>
+                            <urls>
+                              <urls_item>
+                                <lang>en-us</lang>
+                                <url>!("https://lehre.bpm.in.tum.de/~go49leg/fb_matches.html?v=3&amp;data=" + data.fb_b64.to_s)</url>
+                              </urls_item>
+                            </urls>
+                            <default/>
+                          </arguments>
+                        </parameters>
+                        <code>
+                          <finalize output="result">data.choice = result.to_s.gsub('"', '')</finalize>
+                          <update output="result"/>
+                          <rescue output="result"/>
+                        </code>
+                        <annotations>
+                          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                          <_notes><_notes_general/></_notes>
+                        </annotations>
+                        <documentation><input/></documentation>
+                      </call>
+                    </parallel_branch>
+                    <parallel_branch>
+                      <call id="a36" endpoint="frames_display">
+                        <parameters>
+                          <label>QR Back To Table</label>
+                          <arguments>
+                            <type>wait</type>
+                            <lx>8</lx>
+                            <ly>0</ly>
+                            <x_amount>2</x_amount>
+                            <y_amount>3</y_amount>
+                            <urls>
+                              <urls_item>
+                                <lang>en-us</lang>
+                                <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=table&amp;labelb=VGFibGU</url>
+                              </urls_item>
+                            </urls>
+                            <default/>
+                          </arguments>
+                        </parameters>
+                        <code>
+                          <finalize output="result">data.choice = "table"</finalize>
+                          <update output="result"/>
+                          <rescue output="result"/>
+                        </code>
+                        <annotations>
+                          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                          <_notes><_notes_general/></_notes>
+                        </annotations>
+                        <documentation><input/></documentation>
+                      </call>
+                    </parallel_branch>
+                    <parallel_branch>
+                      <call id="a16" endpoint="frames_display">
+                        <parameters>
+                          <label>QR Change League</label>
+                          <arguments>
+                            <type>wait</type>
+                            <lx>8</lx>
+                            <ly>3</ly>
+                            <x_amount>2</x_amount>
+                            <y_amount>3</y_amount>
+                            <urls>
+                              <urls_item>
+                                <lang>en-us</lang>
+                                <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=league&amp;labelb=Q2hhbmdlIGxlYWd1ZQ</url>
+                              </urls_item>
+                            </urls>
+                            <default/>
+                          </arguments>
+                        </parameters>
+                        <code>
+                          <finalize output="result">data.choice = "league"</finalize>
+                          <update output="result"/>
+                          <rescue output="result"/>
+                        </code>
+                        <annotations>
+                          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                          <_notes><_notes_general/></_notes>
+                        </annotations>
+                        <documentation><input/></documentation>
+                      </call>
+                    </parallel_branch>
+                    <parallel_branch>
+                      <call id="a17" endpoint="frames_display">
+                        <parameters>
+                          <label>QR Exit</label>
+                          <arguments>
+                            <type>wait</type>
+                            <lx>8</lx>
+                            <ly>6</ly>
+                            <x_amount>2</x_amount>
+                            <y_amount>2</y_amount>
+                            <urls>
+                              <urls_item>
+                                <lang>en-us</lang>
+                                <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=exit</url>
+                              </urls_item>
+                            </urls>
+                            <default/>
+                          </arguments>
+                        </parameters>
+                        <code>
+                          <finalize output="result">data.choice = "exit"</finalize>
+                          <update output="result"/>
+                          <rescue output="result"/>
+                        </code>
+                        <annotations>
+                          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                          <_notes><_notes_general/></_notes>
+                        </annotations>
+                        <documentation><input/></documentation>
+                      </call>
+                    </parallel_branch>
+                  </parallel>
+
+                  <manipulate id="a43" label="Touch">
+                    <code>data.finished = 0</code>
+                  </manipulate>
+
+                  <choose id="e5" mode="exclusive">
+                    <alternative condition="data.choice.to_s.start_with?('m')">
+
+                      <manipulate id="a18" label="Select Match">
+                        <code>data.matchidx = data.choice.to_s[1..-1]</code>
+                      </manipulate>
+
+                      <call id="a19" endpoint="fb_match_backend">
+                        <parameters>
+                          <label>Fetch Match Detail</label>
+                          <method>:get</method>
+                          <arguments>
+                            <league>!data.league</league>
+                            <idx>!data.matchidx</idx>
+                          </arguments>
+                        </parameters>
+                        <code>
+                          <finalize output="result">data.detail = result</finalize>
+                          <update output="result"/>
+                          <rescue output="result"/>
+                        </code>
+                        <annotations>
+                          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                          <_notes><_notes_general/></_notes>
+                        </annotations>
+                        <documentation><input/></documentation>
+                      </call>
+
+                      <manipulate id="a21" label="Encode Detail">
+                        <code>require 'json'
+require 'base64'
+data.detail_b64 = Base64.urlsafe_encode64(JSON.generate(data.detail), padding: false)</code>
+                      </manipulate>
+
+                      <call id="a22" endpoint="frames_display">
+                        <parameters>
+                          <label>Show Match Detail</label>
+                          <arguments>
+                            <type>set</type>
+                            <lx>0</lx>
+                            <ly>0</ly>
+                            <x_amount>8</x_amount>
+                            <y_amount>8</y_amount>
+                            <urls>
+                              <urls_item>
+                                <lang>en-us</lang>
+                                <url>!("https://lehre.bpm.in.tum.de/~go49leg/fb_match.html?v=1&amp;data=" + data.detail_b64.to_s)</url>
+                              </urls_item>
+                            </urls>
+                            <default/>
+                          </arguments>
+                        </parameters>
+                        <code>
+                          <finalize output="result"/>
+                          <update output="result"/>
+                          <rescue output="result"/>
+                        </code>
+                        <annotations>
+                          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                          <_notes><_notes_general/></_notes>
+                        </annotations>
+                        <documentation><input/></documentation>
+                      </call>
+
+                      <call id="a23" endpoint="frames_display">
+                        <parameters>
+                          <label>QR Back</label>
+                          <arguments>
+                            <type>wait</type>
+                            <lx>8</lx>
+                            <ly>0</ly>
+                            <x_amount>2</x_amount>
+                            <y_amount>8</y_amount>
+                            <urls>
+                              <urls_item>
+                                <lang>en-us</lang>
+                                <url>https://lehre.bpm.in.tum.de/~go49leg/fb_qr.html?v=2&amp;value=back</url>
+                              </urls_item>
+                            </urls>
+                            <default/>
+                          </arguments>
+                        </parameters>
+                        <code>
+                          <finalize output="result">data.choice = "back"</finalize>
+                          <update output="result"/>
+                          <rescue output="result"/>
+                        </code>
+                        <annotations>
+                          <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                          <_notes><_notes_general/></_notes>
+                        </annotations>
+                        <documentation><input/></documentation>
+                      </call>
+
+                      <manipulate id="a44" label="Touch">
+                        <code>data.finished = 0</code>
+                      </manipulate>
+                    </alternative>
+                    <otherwise>
+                      <manipulate id="a24" label="Leave Matches">
+                        <code>data.detail_b64 = ""</code>
+                      </manipulate>
+                    </otherwise>
+                  </choose>
+                </loop>
+              </alternative>
+              <otherwise>
+                <manipulate id="a37" label="Skip Matches">
+                  <code>data.detail_b64 = ""</code>
+                </manipulate>
+              </otherwise>
+            </choose>
+            </loop>
+
+            <choose id="e6" mode="exclusive">
+              <alternative condition="data.choice == 'exit'">
+                <call id="a25" endpoint="frames_display">
+                  <parameters>
+                    <label>Clear Screen</label>
+                    <arguments>
+                      <type>set</type>
+                      <lx>0</lx>
+                      <ly>0</ly>
+                      <x_amount>10</x_amount>
+                      <y_amount>8</y_amount>
+                      <urls/>
+                      <default/>
+                    </arguments>
+                  </parameters>
+                  <code>
+                    <finalize output="result"/>
+                    <update output="result"/>
+                    <rescue output="result"/>
+                  </code>
+                  <annotations>
+                    <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                    <_notes><_notes_general/></_notes>
+                  </annotations>
+                  <documentation><input/></documentation>
+                </call>
+              </alternative>
+              <otherwise>
+                <manipulate id="a27" label="Next League">
+                  <code>data.detail_b64 = ""</code>
+                </manipulate>
+              </otherwise>
+            </choose>
+          </parallel_branch>
+
+          <parallel_branch>
+            <loop id="e11" mode="pre_test" condition="data.finished &lt; 180">
+              <call id="a14" endpoint="timeout">
+                <parameters>
+                  <label>Watchdog Tick</label>
+                  <arguments>
+                    <timeout>3</timeout>
+                  </arguments>
+                </parameters>
+                <code>
+                  <finalize output="result">data.finished += 3</finalize>
+                  <update output="result"/>
+                  <rescue output="result"/>
+                </code>
+                <annotations>
+                  <_timing><_timing_weight/><_timing_avg/><explanations/></_timing>
+                  <_notes><_notes_general/></_notes>
+                </annotations>
+                <documentation><input/></documentation>
+              </call>
+            </loop>
+          </parallel_branch>
+        </parallel>
+      </loop>
+    </description>
+  </description>
+  <transformation>
+    <description type="copy"/>
+    <dataelements type="none"/>
+    <endpoints type="none"/>
+  </transformation>
+</testset>

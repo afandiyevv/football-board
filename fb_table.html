@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>League Table</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(160deg,#0b1a0f 0%,#14301c 100%); color:#eef9f0; min-height:100vh; padding:20px; }
+  h1 { font-size:22px; font-weight:800; margin-bottom:2px; }
+  .sub { font-size:12px; color:#8cb89a; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th { text-align:right; color:#8cb89a; font-weight:700; font-size:11px; text-transform:uppercase;
+    letter-spacing:0.5px; padding:6px 5px; border-bottom:1px solid #23492f; }
+  th.l, td.l { text-align:left; }
+  td { padding:7px 5px; text-align:right; border-bottom:1px solid #16321f; font-variant-numeric:tabular-nums; }
+  tr:last-child td { border-bottom:none; }
+  .pos { width:26px; color:#8cb89a; font-weight:700; }
+  .team { display:flex; align-items:center; gap:7px; font-weight:700; }
+  .team img { width:18px; height:18px; object-fit:contain; }
+  .pts { font-weight:800; color:#22c55e; }
+  tr.ucl .pos { color:#22c55e; } tr.uel .pos { color:#60a5fa; } tr.rel .pos { color:#ef4444; }
+  .form { display:flex; gap:3px; justify-content:flex-end; }
+  .fchip { width:16px; height:16px; border-radius:4px; font-size:9px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; }
+  .W { background:#22c55e; color:#06230f; } .D { background:#eab308; color:#231d06; } .L { background:#ef4444; color:#2b0808; }
+  .empty { padding:40px; text-align:center; color:#5a8c6b; font-style:italic; }
+  .legend { margin-top:12px; font-size:11px; color:#5a8c6b; }
+</style>
+</head>
+<body>
+  <h1 id="title">&#127942; League Table</h1>
+  <div class="sub" id="sub">Scan a code on the right to see the latest matchday</div>
+  <div id="wrap"><div class="empty">Loading&hellip;</div></div>
+  <div class="legend">P played &middot; W/D/L &middot; GD goal difference &middot; Pts points</div>
+<script>
+  function getData(){
+    var raw = new URLSearchParams(window.location.search).get('data');
+    if(!raw) return null;
+    try { return JSON.parse(decodeURIComponent(escape(atob(raw.replace(/-/g,'+').replace(/_/g,'/'))))); }
+    catch(e){ return null; }
+  }
+  var d = getData();
+  if (d && d.table && d.table.length) {
+    document.getElementById('title').innerHTML = '&#127942; ' + (d.league_name || 'League Table');
+    var rows = d.table.map(function(r){
+      var cls = r.pos<=4 ? 'ucl' : (r.pos<=6 ? 'uel' : (r.pos >= d.table.length-2 ? 'rel' : ''));
+      var crest = r.crest ? '<img src="'+r.crest+'" onerror="this.style.display=\'none\'">' : '';
+      var form = (r.form||'').split(',').filter(Boolean).slice(-5)
+        .map(function(x){ return '<span class="fchip '+x.trim()+'">'+x.trim()+'</span>'; }).join('');
+      return '<tr class="'+cls+'"><td class="pos l">'+r.pos+'</td>'+
+        '<td class="l"><span class="team">'+crest+r.team+'</span></td>'+
+        '<td>'+r.played+'</td><td>'+r.w+'</td><td>'+r.d+'</td><td>'+r.l+'</td>'+
+        '<td>'+(r.gd>0?'+':'')+r.gd+'</td><td class="pts">'+r.pts+'</td>'+
+        '<td><div class="form">'+form+'</div></td></tr>';
+    }).join('');
+    document.getElementById('wrap').innerHTML =
+      '<table><tr><th class="l">#</th><th class="l">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th><th>Form</th></tr>'+rows+'</table>';
+  } else {
+    document.getElementById('wrap').innerHTML = '<div class="empty">No table data received.</div>';
+  }
+</script>
+</body>
+</html>

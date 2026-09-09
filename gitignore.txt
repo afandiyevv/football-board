@@ -1,0 +1,5 @@
+*.log
+football.json
+match.json
+table.json
+.DS_Store

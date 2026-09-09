@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football Board</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(160deg, #0f1729 0%, #1a2744 100%); color: #eef2f9;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; text-align: center;
+  }
+  .card { max-width: 380px; width: 100%; }
+  .icon { font-size: 64px; margin-bottom: 12px; }
+  h1 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  p { color: #8a99b8; font-size: 15px; line-height: 1.5; }
+  .err { color: #f87171; }
+  button {
+    margin-top: 22px; padding: 13px 22px; background: linear-gradient(90deg, #2563eb, #4d9fff);
+    border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: 700;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon" id="icon">&#8987;</div>
+    <h1 id="title">Sending…</h1>
+    <p id="msg">Talking to the football board.</p>
+    <button id="retry" style="display:none" onclick="send()">Try again</button>
+  </div>
+
+<script>
+  var params = new URLSearchParams(window.location.search);
+  var cb = params.get('cb');
+  var value = params.get('value') || '';
+  var NAMES = { 'PL': 'Premier League', 'PD': 'La Liga', 'BL1': 'Bundesliga', 'SA': 'Serie A',
+    'matches': 'Matchday', 'table': 'Table', 'league': 'Change league', 'exit': 'Exit', 'back': 'Back' };
+  if (/^m\d+$/.test(value)) NAMES[value] = 'Match ' + (parseInt(value.slice(1), 10) + 1);
+
+  function ok() {
+    document.getElementById('icon').textContent = '\u2705';
+    document.getElementById('title').textContent = (NAMES[value] || value) + ' sent';
+    document.getElementById('msg').textContent = 'Look at the screen \u2014 it is updating now.';
+    document.getElementById('retry').style.display = 'none';
+  }
+  function fail(why) {
+    document.getElementById('icon').textContent = '\u26a0\ufe0f';
+    document.getElementById('title').textContent = 'Could not reach the board';
+    document.getElementById('msg').innerHTML = '<span class="err">' + why + '</span><br>Scan the code on the screen again.';
+    document.getElementById('retry').style.display = 'inline-block';
+  }
+  function send() {
+    if (!cb) { fail('No callback in this link.'); return; }
+    // Same call frames.js makes: a PUT of JSON to the CPEE callback URL
+    $.ajax({ type: 'PUT', url: cb, contentType: 'application/json', data: JSON.stringify(value) })
+      .done(ok)
+      .fail(function (x) { fail('The board may have moved on (' + (x.status || 'network') + ').'); });
+  }
+  send();
+</script>
+</body>
+</html>

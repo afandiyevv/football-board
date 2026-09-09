@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scan</title>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script defer src="https://cpee.org/out/frames/js/frames.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #111a2e; color: #eef2f9;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 8px; text-align: center;
+  }
+  .label { font-size: 13px; font-weight: 800; margin-bottom: 6px; line-height: 1.2; }
+  .label.exit { color: #f87171; }
+  .label.back { color: #8a99b8; }
+  #qr { background: #fff; padding: 6px; border-radius: 8px; line-height: 0; }
+  #qr img, #qr canvas { display: block; }
+  .wait { color: #5a6b8c; font-size: 12px; font-style: italic; }
+</style>
+</head>
+<body>
+  <div class="label" id="label">…</div>
+  <div id="qr"><span class="wait">connecting…</span></div>
+
+<script>
+  var params = new URLSearchParams(window.location.search);
+  var value = params.get('value') || '';
+  var DEFAULT_LABELS = { 'm0': 'Match 1', 'm1': 'Match 2', 'm2': 'Match 3', 'm3': 'Match 4', 'm4': 'Match 5',
+    'PL': 'Premier League', 'PD': 'La Liga', 'BL1': 'Bundesliga', 'SA': 'Serie A',
+    'matches': '\u26bd Matchday', 'table': '\ud83c\udfc6 Table', 'league': '\u21a9 Change league',
+    'exit': '\u23fb Exit', 'back': '\u2190 Back' };
+
+  function b64decode(s) {
+    try { return decodeURIComponent(escape(atob(s.replace(/-/g,'+').replace(/_/g,'/')))); } catch (e) { return ''; }
+  }
+
+  // Label: default by value; a base64 label can override
+  var label = DEFAULT_LABELS[value] || value;
+  var lb = params.get('labelb');
+  if (lb) { var dec = b64decode(lb); if (dec) label = dec; }
+  var el = document.getElementById('label');
+  el.textContent = label;
+  if (value === 'exit') el.className = 'label exit';
+  if (value === 'back') el.className = 'label back';
+
+  var rendered = false;
+  function renderQR() {
+    if (rendered || typeof cpee === 'undefined' || !cpee.callback) return;
+    rendered = true;
+    // The phone opens this URL; fb_send.html PUTs the value to the callback
+    var target = 'https://lehre.bpm.in.tum.de/~go49leg/fb_send.html'
+      + '?cb=' + encodeURIComponent(cpee.callback)
+      + '&value=' + encodeURIComponent(value);
+    var box = document.getElementById('qr');
+    box.innerHTML = '';
+    var size = Math.max(90, Math.min(window.innerWidth, window.innerHeight) - 50);
+    new QRCode(box, { text: target, width: size, height: size, correctLevel: QRCode.CorrectLevel.M });
+  }
+  // CPEE hands over the callback via a message event
+  document.addEventListener('cpee:message', renderQR);
+  window.addEventListener('cpee:message', renderQR);
+  // Safety net: poll briefly in case the message arrived before our listener
+  var tries = 0;
+  var t = setInterval(function () { renderQR(); if (rendered || ++tries > 40) clearInterval(t); }, 250);
+</script>
+</body>
+</html>
